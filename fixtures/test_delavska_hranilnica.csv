@@ -1,0 +1,13 @@
+Banka:;DELAVSKA HRANILNICA D.D. LJUBLJANA;;;
+Komitent:;JANEZ KRANJSKI;;;
+Promet za obdobje:;28.09.2022 - 24.12.2022;;;
+Datum izpisa:;24.12.2022;;;
+
+Raèun;SI56 6100 0001 0000 001;;;
+Valuta;Zaèetno stanje;Breme;Dobro;Konèno stanje;
+EUR;20.250,00;100,00;150,00;20.050,00;
+;;;;
+Valuta;Datum valute;Datum knjiženja;ID transakcije;Št. za reklamacijo;Prejemnik / Plaènik;Breme;Dobro;Referenca plaènika;Referenca prejemnika;Opis prejemnika
+EUR;13.12.2022;13.12.2022;123456520;860000123456520;DELAVSKA HRANILNICA d.d. LJUBLJANA;100,00;;SI99;SI99;PRILIVNA PROVIZIJA
+EUR;13.12.2022;13.12.2022;123456519;860000123456519;PayPal;;150,00;123123123;SI99;San Francisco, CA
+
