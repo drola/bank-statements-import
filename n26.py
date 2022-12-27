@@ -1,6 +1,7 @@
 import csv
 import datetime
 from dataclasses import dataclass
+from decimal import Decimal
 from io import TextIOBase
 from typing import Optional, List
 
@@ -10,20 +11,12 @@ def _str_or_none(s: str) -> Optional[str]:
     return s if len(s) > 0 and s != "-" else None
 
 
-def _parse_amount(s: str) -> Optional[int]:
-    """Parse an amount (i.e. 11353.15) into number of cents (integer)"""
+def _parse_amount(s: str) -> Optional[Decimal]:
+    """Parse an amount (i.e. 11353.15) into a Decimal"""
     if len(s) == 0:
         return None
 
-    whole_and_fraction = s.split('.')
-    whole = int(whole_and_fraction[0])
-    fraction = whole_and_fraction[1] if len(whole_and_fraction) > 1 else "0"
-    if len(fraction) == 1:
-        fraction = f"{fraction}0"
-    is_negative = s.startswith('-')
-    fraction = -int(fraction) if is_negative else int(fraction)
-    assert 0 <= abs(fraction) < 100
-    return whole * 100 + fraction
+    return Decimal(s)
 
 
 @dataclass
@@ -45,10 +38,10 @@ class Transaction:
     payment_reference: Optional[str]
     """Reference or description"""
 
-    amount_eur: int
+    amount_eur: Decimal
     """The amount in EURO cents"""
 
-    amount_foreign_currency: Optional[int]
+    amount_foreign_currency: Optional[Decimal]
     """The amount in foreign currency"""
 
     foreign_currency_type: Optional[str]
@@ -57,7 +50,7 @@ class Transaction:
     Note: some EUR payments will have this set to 'EUR', instead of blank.
     """
 
-    exchange_rate: Optional[float]
+    exchange_rate: Optional[Decimal]
     """The exchange rate between EUR and the foreign currency.
     
     If foreign currency is EUR, this is 1.0"""
@@ -79,7 +72,7 @@ class Transaction:
                 amount_eur=_parse_amount(t[5]),
                 amount_foreign_currency=_parse_amount(t[6]),
                 foreign_currency_type=_str_or_none(t[7]),
-                exchange_rate=float(t[8]) if len(t[8]) > 0 else None
+                exchange_rate=Decimal(t[8]) if len(t[8]) > 0 else None
 
             ) for t in reader
         ]

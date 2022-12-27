@@ -1,6 +1,7 @@
 import csv
 import datetime
 from dataclasses import dataclass
+from decimal import Decimal
 from io import TextIOBase
 from typing import List, Optional
 
@@ -10,20 +11,13 @@ def _parse_date(d: str) -> datetime.date:
     return datetime.datetime.strptime(d, "%d.%m.%Y").date()
 
 
-def _parse_amount(a: str) -> Optional[int]:
-    """Parse an amount (i.e. 11.353,15) into number of cents (integer)"""
+def _parse_amount(a: str) -> Optional[Decimal]:
+    """Parse an amount (i.e. 11.353,15) into a Decimal"""
     if len(a) == 0:
         return None
 
-    whole_and_fraction = a.replace('.', '').split(',')
-    whole = int(whole_and_fraction[0])
-    fraction = whole_and_fraction[1] if len(whole_and_fraction) > 1 else "0"
-    if len(fraction) == 1:
-        fraction = f"{fraction}0"
-    fraction = int(fraction)
-
-    assert 0 <= fraction < 100
-    return whole * 100 + fraction
+    whole_and_fraction = a.replace('.', '').replace(',', '.')
+    return Decimal(whole_and_fraction)
 
 
 @dataclass
@@ -62,10 +56,10 @@ class Transaction:
     payer_or_payee: str
     """The other party in the transaction"""
 
-    amount_paid: Optional[int]
+    amount_paid: Optional[Decimal]
     """Amount paid, in cents"""
 
-    amount_received: Optional[int]
+    amount_received: Optional[Decimal]
     """Amount received, in cents"""
 
     reference_payee: str
@@ -79,7 +73,7 @@ class Transaction:
 
 
 @dataclass
-class TransactionExport:
+class TransactionsExport:
     """Transaction export and metadata"""
 
     account: Account
@@ -94,11 +88,13 @@ class TransactionExport:
     export_date: datetime.date
     """The date of the export"""
 
+    final_balance: Decimal
+
     transactions: List[Transaction]
     """Transactions"""
 
     @classmethod
-    def from_text(cls, text: TextIOBase) -> 'TransactionExport':
+    def from_text(cls, text: TextIOBase) -> 'TransactionsExport':
         reader = csv.reader(text, delimiter=';', )
 
         bank_line = next(reader)
@@ -123,8 +119,9 @@ class TransactionExport:
         assert account_number_line[0] == 'Račun'
         account_number = account_number_line[1]
 
-        assert next(reader)[0] == 'Valuta'
-        currency = next(reader)[0]
+        balances_header_line = next(reader)[0:5]
+        assert balances_header_line == ['Valuta', 'Začetno stanje', 'Breme', 'Dobro', 'Končno stanje']
+        [currency, initial_balance, total_paid, total_received, final_balance] = next(reader)[0:5]
         assert len(currency) == 3
         next(reader)
 
@@ -147,11 +144,12 @@ class TransactionExport:
             export_from=export_from,
             export_to=export_to,
             export_date=export_date,
+            final_balance=_parse_amount(final_balance),
             transactions=transactions
         )
 
     @classmethod
-    def from_file(cls, filename: str) -> 'TransactionExport':
+    def from_file(cls, filename: str) -> 'TransactionsExport':
         with open(filename, 'rt', encoding='cp1250') as f:
             return cls.from_text(f)
 
