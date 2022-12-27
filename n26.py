@@ -59,8 +59,9 @@ class Transaction:
     def from_text(cls, text: TextIOBase) -> List['Transaction']:
         reader = csv.reader(text, delimiter=",", quoting=csv.QUOTE_ALL, quotechar='"')
 
-        assert next(reader) == ["Date", "Payee", "Account number", "Transaction type", "Payment reference",
-                                "Amount (EUR)", "Amount (Foreign Currency)", "Type Foreign Currency", "Exchange Rate"]
+        header_line = next(reader)
+        assert header_line == ["Date", "Payee", "Account number", "Transaction type", "Payment reference",
+                               "Amount (EUR)", "Amount (Foreign Currency)", "Type Foreign Currency", "Exchange Rate"]
 
         return [
             Transaction(
