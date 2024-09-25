@@ -87,5 +87,6 @@ n26_transactions = [N26Transaction(date=datetime.date(2022, 1, 12),
                                    foreign_currency_type=None,
                                    exchange_rate=None)]
 test_n26_csv = os.path.join(os.path.dirname(__file__), 'test_n26.csv')
+test_n26_legacy_csv = os.path.join(os.path.dirname(__file__), 'test_legacy_n26.csv')
 
 test_dh2ofx_ofx = os.path.join(os.path.dirname(__file__), 'test_dh2ofx.ofx')

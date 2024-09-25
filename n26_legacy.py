@@ -60,21 +60,20 @@ class Transaction:
         reader = csv.reader(text, delimiter=",", quoting=csv.QUOTE_ALL, quotechar='"')
 
         header_line = next(reader)
-        assert header_line == ["Booking Date", "Value Date", "Partner Name", "Partner Iban", "Type",
-                               "Payment Reference", "Account Name", "Amount (EUR)", "Original Amount",
-                               "Original Currency", "Exchange Rate"]
+        assert header_line == ["Date", "Payee", "Account number", "Transaction type", "Payment reference",
+                               "Amount (EUR)", "Amount (Foreign Currency)", "Type Foreign Currency", "Exchange Rate"]
 
         return [
             Transaction(
-                date=datetime.date.fromisoformat(t[1]),
-                payer_or_payee=t[2],
-                payer_or_payee_account_number=_str_or_none(t[3]),
-                transaction_type=t[4],
-                payment_reference=_str_or_none(t[5]),
-                amount_eur=_parse_amount(t[7]),
-                amount_foreign_currency=_parse_amount(t[8]),
-                foreign_currency_type=_str_or_none(t[9]),
-                exchange_rate=Decimal(t[10]) if len(t[10]) > 0 else None
+                date=datetime.date.fromisoformat(t[0]),
+                payer_or_payee=t[1],
+                payer_or_payee_account_number=_str_or_none(t[2]),
+                transaction_type=t[3],
+                payment_reference=_str_or_none(t[4]),
+                amount_eur=_parse_amount(t[5]),
+                amount_foreign_currency=_parse_amount(t[6]),
+                foreign_currency_type=_str_or_none(t[7]),
+                exchange_rate=Decimal(t[8]) if len(t[8]) > 0 else None
 
             ) for t in reader
         ]
